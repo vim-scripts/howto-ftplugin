@@ -26,6 +26,7 @@
 " Maintainer:  John Sumsion (jdsumsion at earthlink net)
 " License:     This plugin is placed in the public domain
 " Version History:
+" 1.1 (15 Dec 2003) - made trailing decimal after outline numbers optional
 " 1.0 (15 Dec 2003) - initial upload
 "
 
@@ -54,18 +55,29 @@ endif
 "
 
 function! s:SwitchBetweenHOWTO_TOC_Section()
-  " Finds any of the following:
+  " Swaps between any of the following pairs:
   " Chapter 1. How can I help?
   " 1. How can I help?
   "         5.1.1. Current Kernel source(Optional).
   " 5.1.1. Current Kernel source(Optional).
-  let HOWTO_SectionPattern = '\v^(Chapter | *)?((\d+\.)+.*)$'
+  "      1.1 New Versions of this Document
+  " 1.1.  New Versions of this Document
+
+  " match optional starting whitepace
+  " match optional "Chapter "
+  " match (and save) many "n." even ending in a digit
+  let HOWTO_SectionPattern = '\v^ *(Chapter *)?([[:digit:].]{-1,})\.? +(.*)$'
   let current_line=getline('.')
   if (current_line =~ HOWTO_SectionPattern)
-    " extract the HOWTO section (incl. section number and name)
-    let section_number_name = substitute(current_line, HOWTO_SectionPattern, '\2', '')
-    let escaped_section_name = escape(section_number_name, '\')
-    call search('\V\(Chapter \| \*\)\?' . escaped_section_name, 'w')
+    " extract the HOWTO section number and name
+    let section_number = substitute(current_line, HOWTO_SectionPattern, '\2', '')
+    let section_name = substitute(current_line, HOWTO_SectionPattern, '\3', '')
+    let section_number = escape(section_number, '\')
+    let section_name = escape(section_name, '\')
+
+    " look for a line similar to the pattern matched above
+    " note the use of the optional trailing period
+    call search('\V\(Chapter \| \*\)\?' . section_number . '\.\? \+' . section_name, 'w')
   else
     " if not on a section line, look back for the first section line we see
     call search(HOWTO_SectionPattern, 'bW')
@@ -73,13 +85,13 @@ function! s:SwitchBetweenHOWTO_TOC_Section()
     if (resulting_line =~ HOWTO_SectionPattern)
       " call recursively to do the actual switching (we know it will succeed
       " because we have already checked to see if the current line matches)
-      call SwitchBetweenHOWTO_TOC_Section()
+      call s:SwitchBetweenHOWTO_TOC_Section()
     endif
   endif
 endf
 
 function! s:GotoNextHOWTO_Section()
-  let HOWTO_SectionPattern = '\v^(Chapter | *)?((\d+\.)+.*)$'
+  let HOWTO_SectionPattern = '\v(Chapter *)?([[:digit:].]+) +(.*)$'
   call search(HOWTO_SectionPattern, 'W')
 endf
 
