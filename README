@@ -1,0 +1,19 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=847
+
+ftplugin for browsing HOWTO files
+<LocalLeader><CR> switches between TOC and HOWTO body (from <1> to <2> below)
+<LocalLeader><Space> goes to the next topic in the HOWTO (from <2> to <3>)
+
+Example:
+<<BEGIN>>
+Table of Contents
+1. How can I help? <1>
+    1.1. Assisting with the Net-HOWTO
+...
+-----------------------------------------------------------------------------
+Chapter 1. How can I help? <2>
+...
+-----------------------------------------------------------------------------
+1.1. Assisting with the Net-HOWTO <3>
+<<END>>
+
